@@ -74,6 +74,32 @@ app.post('/students/add', (req, res) => {
   });
 });
 
+app.get('/students/search', (req, res) => {
+  const search = req.query.search;
+
+  const sql = `
+    SELECT * FROM students
+    WHERE student_id LIKE ?
+       OR first_name LIKE ?
+       OR last_name LIKE ?
+       OR course LIKE ?
+    ORDER BY id DESC
+  `;
+
+  const keyword = `%${search}%`;
+
+  db.query(sql, [keyword, keyword, keyword, keyword], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Database error');
+    }
+
+    res.render('index', {
+      students: results
+    });
+  });
+});
+
 app.listen(3000, () => {
     console.log('Server running at http://localhost:3000');
 });
